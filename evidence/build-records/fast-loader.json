@@ -1,0 +1,74 @@
+{
+  "status": "experimental-offline-build",
+  "camera_tested": false,
+  "xpro3_loader_sha256": "2ffa7d99ca1077aeae4657b12bfa5a4e4efdf3b9866fbd3cddc30b711109a063",
+  "xpro3_image_sha256": "4806038ec4f727364e9a610b853c00b52fd8de134411b39d4875f314580475a5",
+  "outputs": {
+    "ffinit.bin": {
+      "size": 40808,
+      "sha256": "f6238da1de1a93cf99ebd06dda51f03037ddc18e1dc4c91558776492a701528f"
+    },
+    "ffboot.bin": {
+      "size": 33898496,
+      "sha256": "4c27bc0fc0a8a864608226da2b0a037b5f8c2344add765c22fb63d4744ce8d5e"
+    }
+  },
+  "checks": [
+    {
+      "op": 0,
+      "address": 12290,
+      "length": 3698,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 1,
+      "address": 16384,
+      "length": 4,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 2,
+      "address": 17009,
+      "length": 3,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 3,
+      "address": 17096,
+      "length": 2,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 4,
+      "address": 17132,
+      "length": 3,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 5,
+      "address": 17200,
+      "length": 2,
+      "same": true,
+      "metadata": false,
+      "applied": true
+    },
+    {
+      "op": 6,
+      "address": 18309,
+      "length": 10,
+      "same": false,
+      "metadata": true,
+      "applied": false
+    }
+  ]
+}

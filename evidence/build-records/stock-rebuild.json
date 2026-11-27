@@ -1,0 +1,8 @@
+{
+  "recipe": "recipes/stock-rebuild.json.xz",
+  "base_sha256": "4806038ec4f727364e9a610b853c00b52fd8de134411b39d4875f314580475a5",
+  "result_sha256": "4806038ec4f727364e9a610b853c00b52fd8de134411b39d4875f314580475a5",
+  "result_size": 66535424,
+  "applied_ops": [],
+  "camera_tested": false
+}

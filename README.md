@@ -98,7 +98,8 @@ bench/xpro3-bench/   the Rust bench and its 15 tests
 configs/             the xpro3-200-handoff run configuration
 recipes/             published recipes: the identity check and the fast loader
 docs/                findings, build guide, recipe format, roadmap, porting
-evidence/            decompiled excerpts, upstream baseline, hook comparisons
+evidence/            decompiled excerpts, upstream baseline, hook comparisons,
+                     and the builders' own reports
 tools/               dependency-free Python that builds and verifies everything
 scripts/             install-bench.sh
 LICENSES/            MIT texts of the redistributed third-party material

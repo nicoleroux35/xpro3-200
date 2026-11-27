@@ -89,7 +89,10 @@ Produces:
 | `out/fast-loader/ffboot.bin` | 33 898 496 | `4c27bc0fc0a8a864608226da2b0a037b5f8c2344add765c22fb63d4744ce8d5e` |
 
 **This pair has never been run on a camera.** The build report it writes says
-so. Treat it as a development artifact.
+so, and it is kept in
+[`evidence/build-records/fast-loader.json`](../evidence/build-records/fast-loader.json)
+with the per-operation check that made the reuse legitimate. Treat it as a
+development artifact.
 
 ## 4. Testing it in the emulator
 
