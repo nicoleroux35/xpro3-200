@@ -57,6 +57,12 @@ Nothing in this repository contains Fujifilm firmware bytes.
 - `evidence/hook-comparison-*.md` and `evidence/function-candidates.json`
   compare its 371 guarded X-T3 hook sites against the X-Pro3, X-T4 and X100V
   images. The recipe itself is not redistributed; the comparison is.
+- **`recipes/fast-loader-xt3.json.xz` is redistributed verbatim**, from its
+  `firmware/recipes/fast-loader.json.xz` at commit `1ac5136`. It is the seven
+  `own` operations — 3 722 bytes — that make up its fast loader. They are its
+  own code, not Fujifilm's, which is why they can be republished here; the
+  `tools/build_xpro3_fast_loader.py` step that reuses them verifies first that
+  every patch site is byte-identical between the X-T3 and X-Pro3 loaders.
 
 ## `fujihack/fujihack` — https://github.com/fujihack/fujihack
 
