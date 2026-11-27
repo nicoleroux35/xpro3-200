@@ -1,0 +1,79 @@
+name: verify
+
+# What runs without firmware and without a camera: the recipe validator, the
+# Python tests, and the bench's catalog and layout tests. The firmware-dependent
+# tests skip themselves when FWUP0021.DAT is absent, which is always the case
+# here: no Fujifilm update is committed, so CI cannot run them.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tools:
+    name: Recipes and Python tools
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate every published recipe
+        run: python3 tools/verify_recipes.py recipes/
+      - name: Run the validator's own tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Byte-compile every tool
+        run: python3 -m compileall -q tools
+
+  bench:
+    name: Bench build and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: System libraries for the window backend
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libxkbcommon-dev libwayland-dev libx11-dev libgl1-mesa-dev
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache the workspace
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            fujimod/target
+          key: bench-${{ hashFiles('bench/xpro3-bench/Cargo.toml') }}
+      - name: Install the bench into a FujiMod checkout
+        run: |
+          git clone --recursive --depth 1 https://github.com/justjake/fujimod.git fujimod
+          ./scripts/install-bench.sh fujimod
+      - name: Build
+        run: cargo build -p fujimod-xpro3-bench
+        working-directory: fujimod
+      - name: Test
+        # The firmware-dependent tests print a skip notice and pass: there is no
+        # FWUP0021.DAT anywhere in CI, by design.
+        run: cargo test -p fujimod-xpro3-bench
+        working-directory: fujimod
+
+  self-check:
+    name: This project's own hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No firmware bytes are tracked
+        run: |
+          if git ls-files | grep -iE '\.dat$|ffboot\.bin|ffinit\.bin|boot-info\.bin|FWUP[0-9]+\.zip'; then
+            echo "::error::a firmware-derived file is tracked"
+            exit 1
+          fi
+      - name: Notices stay consistent with the licence files
+        run: |
+          for name in fffw fujifilm-xFW xt3-cfw; do
+            test -f "LICENSES/${name}-MIT.txt" || { echo "::error::missing LICENSES/${name}-MIT.txt"; exit 1; }
+          done
