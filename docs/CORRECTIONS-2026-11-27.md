@@ -2,7 +2,7 @@
 
 Supersedes the parts of `EMULATOR-2026-11-26.md` listed below. Everything here
 is measured on the stock `FWUP0021.DAT` with the plan named in each section, and
-pinned by tests in `apps/xpro3-bench/tests/`.
+pinned by tests in `bench/xpro3-bench/tests/`.
 
 The 26 November report is kept unchanged as a session record. Three of its
 conclusions did not survive further measurement, and one of its premises was
@@ -202,9 +202,37 @@ one of:
 - `boot_rom` and `generated_facts.observation` in the catalog, which only a
   capture can produce.
 
-## 8. Reproducing
+## 8. The same defect was in the tool that assembles the board
 
-Tests in `apps/xpro3-bench/tests/` pin every measurement above and skip
+`assemble_xp4_board.py`, which produces the complete board definition (raw
+windows as the page-aligned complement of the device owners, plus register
+banks), carried the same hardcoded `storage_dma_routes = list(range(32, 48))`.
+It was the tool whose output otherwise booted, so the wiring defect travelled
+into every plan it emitted.
+
+It now reads `catalog/soc/xp4/blocks/dma.json` and refuses a block that does not
+declare sixteen lines, like `generate_xpro3_plan.py`. With that one field
+corrected, the assembled board is identical to the hand-built working profile in
+all 24 other definition keys, and it starts: `0x1090BEC` on core 1 at
+37 404 006 instructions, `0x1163754` at 52 288 787. Declaring `32..47` instead
+leaves it on the `0x400` wait for the whole 60 000 000-instruction budget.
+
+`tests/dma_routes.rs` now runs both wirings on the same image and asserts the
+difference, so the defect cannot return silently.
+
+After storage init, the assembled board still meets two refusals, and only one
+of them is a measurement:
+
+- `power_spi_command_output` register 17: the stock image writes 4096 there, and
+  the model supports the register once it is declared writable. The write is
+  observed; the declaration only tells the model the register exists.
+- `discovery_tx_receiver`: the address and request id are **borrowed from the
+  X-T3 profile** and not measured on an X-Pro3. This remains a hypothesis.
+
+
+## 9. Reproducing
+
+Tests in `bench/xpro3-bench/tests/` pin every measurement above and skip
 themselves when the firmware is absent:
 
 | test | asserts |
@@ -214,6 +242,7 @@ themselves when the firmware is absent:
 | `execcpu.rs` | only `0x1163A54` creates threads; 11 threads total |
 | `display.rs` | the five LCDC functions stay unentered; no frame exists |
 | `dispatch.rs` | segment map matches the catalog; all 38 unreached callers are in the second segment |
+| `dma_routes.rs` | the DMA field alone decides whether the completion is delivered |
 | `catalog.rs` | 632 scenes, 1872 settings, 105 rows, 42 menus with stock ids |
 | `window.rs` | the bench draws stock labels only, headless |
 

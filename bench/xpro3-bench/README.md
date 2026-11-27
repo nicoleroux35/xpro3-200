@@ -16,6 +16,7 @@ apps/xpro3-bench/                (this crate, installed by scripts/install-bench
   tests/tasks.rs     the 167 tasks are registered, not created
   src/dispatch.rs    segment map and the thread-create callers no code reaches
   tests/dispatch.rs  pins that segment map and the unreached callers
+  tests/dma_routes.rs the DMA wiring alone decides whether storage init completes
   tests/window.rs    the tabs actually lay out the stock labels, headless
 ```
 
@@ -286,6 +287,9 @@ Verified on this machine:
   second FFLZ segment;
 - `tests/catalog.rs` pins 632 scenes, 1872 settings, 105 scanner rows and the
   42 menu screens with their stock ids;
+- `tests/dma_routes.rs` runs the same image twice, changing only
+  `storage_dma_routes`: `207..222` reaches the completion poster at `0x1090BEC`,
+  `32..47` never does and stays on the `0x400` wait;
 - `tests/window.rs` runs a real `egui::Context` headless and asserts the menu
   table is laid out with stock labels only.
 

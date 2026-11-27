@@ -4,6 +4,11 @@
 Device-owner windows are taken from the checked XP4 device contracts. Raw MMIO
 windows are the page-aligned complement; register banks cover the within-page
 gaps that cannot be represented by page-aligned raw windows.
+
+The DMA completion lines are read from the catalog's `dma` block rather than
+written here. The X-Pro3 firmware arms lines 207..222 for its sixteen channels;
+declaring any other numbers leaves its completion interrupt pending forever and
+stops the run at storage init. See ../docs/CORRECTIONS-2026-11-27.md.
 """
 
 from __future__ import annotations
@@ -17,6 +22,25 @@ from typing import Any
 
 def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def dma_routes(fujimod: Path) -> list[int]:
+    """The sixteen channel completion lines, from the catalog's DMA block.
+
+    A block that does not declare exactly sixteen lines is refused: guessing the
+    wiring is what made the plan stall at storage init in the first place.
+    """
+    block_path = fujimod / "catalog/soc/xp4/blocks/dma.json"
+    if not block_path.exists():
+        raise SystemExit(f"catalog DMA block not found: {block_path}")
+    block = json.loads(block_path.read_text())
+    lines = [int(entry["line"]) for entry in block.get("interrupts", [])]
+    if len(lines) != 16:
+        raise SystemExit(
+            "catalog dma block must declare 16 channel interrupt lines, "
+            f"found {len(lines)}"
+        )
+    return lines
 
 
 def page(value: int) -> int:
@@ -105,8 +129,25 @@ EXCLUDED_PAGES = merge([(page(lo), page(hi - 1) + 0x1000) for lo, hi in OWNERS])
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--firmware-dir", type=Path, required=True)
+    parser.add_argument(
+        "--fujimod",
+        type=Path,
+        help="FujiMod checkout holding catalog/soc/xp4/blocks (default: ./fujimod beside this project)",
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
+
+    fujimod = args.fujimod
+    if fujimod is None:
+        for candidate in (Path("fujimod"), Path("../fujimod"), Path.cwd() / "fujimod"):
+            if (candidate / "catalog/soc/xp4/blocks/dma.json").exists():
+                fujimod = candidate
+                break
+    if fujimod is None or not (fujimod / "catalog/soc/xp4/blocks").exists():
+        raise SystemExit(
+            "no FujiMod catalog found; pass --fujimod PATH/TO/FUJIMOD"
+        )
+    storage_dma_routes = dma_routes(fujimod)
 
     firmware = args.firmware_dir
     boot_info = bytearray(1488)
@@ -210,7 +251,7 @@ def main() -> None:
         "storage_jedec": 2145056,
         "storage_geometry": [65536, 256, 4096, 512],
         "storage_irq": 37,
-        "storage_dma_routes": list(range(32, 48)),
+        "storage_dma_routes": storage_dma_routes,
         "sd_hosts": [
             {"options": sd_options, "card": sd_card, "irq": 230},
             {"options": sd_options_2, "card": sd_card, "irq": 237},
