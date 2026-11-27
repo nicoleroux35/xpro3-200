@@ -1,135 +1,122 @@
-# X-Pro3 2.00 — emulator bench, findings and tooling
+# X-Pro3 2.00 — custom firmware, and the emulator to test it
 
-Everything here is about one camera and one file: the **Fujifilm X-Pro3 2.00**
-firmware, `FWUP0021.DAT`, 50 087 104 bytes, SHA-256
+A project to build a custom firmware for the **Fujifilm X-Pro3 2.00** and to
+develop it against an emulator instead of a camera. Everything is about one
+file: `FWUP0021.DAT`, 50 087 104 bytes, SHA-256
 `30ca22af2e1341c65d8f0637cc5e3ec675628cee8f517de0f1275bb5725c9f39`.
 
-The project has three parts:
+**No Fujifilm firmware is distributed here.** Builds start from the official
+update, which you supply; changes are published as recipes that carry only the
+bytes their author wrote. The emulator's firmware-dependent tests skip
+themselves when the update is absent.
 
-| part | what it is |
+## Where it stands
+
+| piece | state |
 | --- | --- |
-| [`bench/`](bench/xpro3-bench/README.md) | a desktop bench that runs the stock firmware in the FujiMod XP4 emulator and shows what it does |
-| [`docs/`](docs/CORRECTIONS-2026-11-27.md) | the findings, including corrections to earlier conclusions |
-| [`evidence/`](evidence/) + [`tools/`](tools/) | the decompiled evidence and the dependency-free scripts that regenerate every number |
+| [emulator bench](bench/xpro3-bench/README.md) | runs the stock image in FujiMod's XP4 emulator; **15 tests** |
+| [recipe format](docs/RECIPE-FORMAT.md), [builder](tools/xpro3_build.py), [validator](tools/verify_recipes.py) | done and tested in both directions |
+| [stock base](docs/BUILD.md) from the official update | done, hashes pinned |
+| [fast SD loader](docs/BUILD.md) for the X-Pro3 | built, reproduces bit for bit, **never run on a camera** |
+| a modification that changes behaviour | not started — see [the roadmap](docs/ROADMAP.md) |
 
-**No Fujifilm firmware is distributed here.** Every tool and test takes the
-update file as an argument, and the bench's firmware-dependent tests skip
-themselves when it is absent.
+The emulator works and is the development loop. The firmware modification is
+the next piece of work, and the roadmap explains why the emulator had to come
+first.
 
-## What was measured
+## Quick start — run the stock firmware
 
-The stock X-Pro3 2.00 firmware runs its ThreadX kernel in the emulator, reaches
-storage init, and then stops. Three defects explain why, and none of them is a
-missing device model:
-
-1. **The storage stop was a wiring mistake in a generated plan.** The X-Pro3
-   firmware arms GIC line **207** for its storage DMA completion; the plan
-   generator declared lines `32..47`. The completion interrupt therefore stayed
-   pending forever. With the routes corrected to the catalog's `207..222` — and
-   **no firmware patch** — the completion callback runs on core 1 at
-   37 404 006 instructions and storage init finishes at 52 288 787.
-2. **The application tasks are registered but never created.** `TSK_ROOT`
-   inserts 167 task descriptors into the registry at `0x7A944`, and the
-   function that does it (`0x4BE9C`) is a registry insert, not a thread create.
-   ThreadX ends up with 11 threads: `timer`, five `execcpu`, four idles and
-   `root`. `TSK_UILIB` and `TSK_LCDEVF` are registered and have none.
-3. **The display controller is never programmed.** Five functions touch the
-   LCDC; none is entered, so the output-enable bit is never written and no
-   frame is published. The LCDC model itself is complete.
-
-The five `execcpu` threads exist but suspend on a message queue and are never
-resumed. Of the 23 subsystem initialisers that run after the start loop,
-exactly one creates threads (`0x1163A54` → `0x1143C10`), and it creates only
-those five.
-
-### What remains, and what only hardware can settle
-
-`0x114F798` is the function that turns a descriptor into a thread. It has 90
-call sites. 52 live in the first FFLZ segment, which the run executes; **38
-live in the second segment and are referenced by nothing** — not as a literal,
-not through a `movw`/`movt` pair, not with the Thumb bit masked. They are the
-shape of entry points installed from outside the loaded image.
-
-No further analysis of the file can settle who installs them. That needs a RAM
-dump from a body that boots, or the loader, or catalog facts only a capture can
-produce.
-
-## The interface, honestly
-
-The menu **structure** is in the image and is browsable: 632 named UI scenes,
-1872 named settings, 105 scanner rows, of which 42 scenes are menus
-(`UILIB_SUB_SCR_RECMENU` 352, `PLAYMENU` 354, `DMENU` 351, `MENU_MYMENU` 411,
-`RECQMENU` 466, `QMENU_CUSTOM_MAIN` 467, …).
-
-The menu **words** are not. `IMAGE QUALITY`, `FILM SIMULATION`, `MY MENU`,
-`SHOOTING SETTING` and `SET UP` do not occur in the image in ASCII, UTF-16LE,
-UTF-16BE or Shift-JIS, and there is no font or glyph atlas either. What exists
-is the internal string table (`BKUP_DOTLCD_POWOFF_IMAGE_QUAL_FINE`,
-`DOT_INFO_FILM_PROVIA`, …), which is where the setting names come from.
-
-So the bench shows identifiers, never a translation. A test enforces that no
-view can carry an invented printed word.
-
-## Using the bench
-
-The bench is a workspace member of the emulator it drives, so it is installed
-into a FujiMod checkout rather than duplicating the emulator:
+`firmware-dir` is the output of the first step of
+[`docs/BUILD.md`](docs/BUILD.md): the stock base built from your own copy of the
+official update. It is not in this repository.
 
 ```bash
 git clone --recursive https://github.com/justjake/fujimod.git
 ./scripts/install-bench.sh ./fujimod
-```
-
-Then, with the X-Pro3 update and a plan generated from the catalog:
-
-```bash
 cd fujimod
+
+python3 ../tools/assemble_xp4_board.py \
+  --fujimod . --firmware-dir ../firmware-dir --output /tmp/xp3-plan.json
+python3 ../tools/make_diagnostic_plan.py /tmp/xp3-plan.json /tmp/xp3-run.json
+
 cargo run -p fujimod-xpro3-bench -- \
-  --update /path/to/FWUP0021.DAT \
-  --application-plan /tmp/xpro3-plan.json \
-  --discovery --poke 0xa2ec=4
+  --update ../firmware-dir/FWUP0021.DAT \
+  --application-plan /tmp/xp3-run.json \
+  --discovery --poke 0xa2ec=4 --check
 ```
 
-`--view menus` (or `settings`, `inputs`, `screen`) opens on a given tab;
-`--check` prints the milestone table as JSON without a window.
+`--check` prints a milestone table and exits; drop it and you get a window with
+the firmware's own menus, settings and inputs, under their internal names.
+`--view settings` (or `menus`, `inputs`, `screen`) opens on a tab.
 
-Generate the plan first:
+## What the emulator established
+
+The stock image reaches storage init and, given the wiring its own catalog
+declares, finishes it. Three things explain everything after that, and none is
+a missing device model — the full argument, with instruction counts and
+addresses, is in [`docs/CORRECTIONS-2026-11-27.md`](docs/CORRECTIONS-2026-11-27.md).
+
+1. **The storage stop was a defect in a generated plan.** The firmware arms GIC
+   line **207** for its DMA completion; the plan declared `32..47`, so the
+   interrupt never arrived. With the catalog's `207..222` — and **no firmware
+   patch** — the completion runs on core 1 at 37 404 006 instructions and
+   storage init finishes at 52 288 787. A test now pins both directions.
+2. **167 application tasks are registered and never created.** The start loop
+   calls a registry insert, not `tx_thread_create`, and ignores its result.
+   ThreadX holds 11 threads, none of them `TSK_UILIB` or `TSK_LCDEVF`.
+3. **The display controller is never programmed**, so no frame exists. The LCDC
+   model is complete; the firmware never reaches the code that enables it.
+
+That last point is why the emulator matters: `0x114F798`, the function that
+reaches `tx_thread_create`, has **38 call sites in the second segment that
+nothing in the image references**. A modification that makes one application
+task a real thread is the shortest path to a visible screen — and the only way
+to test it is to run it.
+
+## Building a modified image
 
 ```bash
-python3 tools/generate_xpro3_plan.py \
-  --fujimod ./fujimod \
-  --firmware-dir /path/to/firmware-dir \
-  --output /tmp/xpro3-plan.json
+# stock base, from the official update
+./fujimod/target/release/fujimod-sd-card sd-card-recovery-build \
+  xpro3-200 FWUP0021.DAT baseline/
+
+# apply a recipe, with every guard checked
+python3 tools/verify_recipes.py recipes/ --base baseline/ffboot.bin
+python3 tools/xpro3_build.py \
+  --recipe recipes/stock-rebuild.json.xz \
+  --base baseline/ffboot.bin --output out/ffboot.bin
 ```
 
-See [`tools/README.md`](tools/README.md) for the plan generator's known
-limitation and for `make_diagnostic_plan.py`, which produces a runnable plan.
+Steps, hashes and the experimental fast loader are in
+[`docs/BUILD.md`](docs/BUILD.md). The recipe operations are in
+[`docs/RECIPE-FORMAT.md`](docs/RECIPE-FORMAT.md).
 
 ## Layout
 
 ```
-bench/xpro3-bench/     the Rust bench and its 13 tests
-configs/               the xpro3-200-handoff run configuration
-docs/                  findings, corrections, porting notes, source inventory
-evidence/              decompiled excerpts, upstream baseline, comparisons
-tools/                 dependency-free Python that regenerates the evidence
-scripts/               install-bench.sh
-LICENSES/              MIT texts of the redistributed third-party material
-NOTICE                 every source, its licence, and what was taken
+bench/xpro3-bench/   the Rust bench and its 15 tests
+configs/             the xpro3-200-handoff run configuration
+recipes/             published recipes: the identity check and the fast loader
+docs/                findings, build guide, recipe format, roadmap, porting
+evidence/            decompiled excerpts, upstream baseline, hook comparisons
+tools/               dependency-free Python that builds and verifies everything
+scripts/             install-bench.sh
+LICENSES/            MIT texts of the redistributed third-party material
+NOTICE               every source, its licence, and what was taken
 ```
 
 ## Reading order
 
-1. [`docs/CORRECTIONS-2026-11-27.md`](docs/CORRECTIONS-2026-11-27.md) — the
-   current findings.
-2. [`docs/SESSION-2026-11-26.md`](docs/SESSION-2026-11-26.md) — the earlier
-   session report, kept as a record with a banner listing what was withdrawn.
-3. [`docs/PORTING.md`](docs/PORTING.md) — what the X-Pro3 shares with the
-   X-T3, X-T4 and X100V, and what it does not.
-4. [`docs/SOURCES.md`](docs/SOURCES.md) — the upstream search, and what each
-   repository was usable for.
-5. [`docs/DUAL-BOOT.md`](docs/DUAL-BOOT.md) — the dual-boot question and its
-   preconditions.
+1. [`docs/ROADMAP.md`](docs/ROADMAP.md) — what is built, what is next, what only
+   hardware can settle.
+2. [`docs/BUILD.md`](docs/BUILD.md) — reproduce the base, the loader, and a run.
+3. [`docs/CORRECTIONS-2026-11-27.md`](docs/CORRECTIONS-2026-11-27.md) — the
+   current findings, including the three earlier conclusions they replace.
+4. [`docs/RECIPE-FORMAT.md`](docs/RECIPE-FORMAT.md) — how a change is published
+   without publishing firmware.
+5. [`docs/PORTING.md`](docs/PORTING.md) and
+   [`docs/SOURCES.md`](docs/SOURCES.md) — what the X-Pro3 shares with the X-T3,
+   X-T4 and X100V, and where each upstream project was usable.
 
 ## Licences
 
@@ -139,6 +126,7 @@ own notice: see [`NOTICE`](NOTICE) and [`LICENSES/`](LICENSES/).
 
 ## Safety
 
-Nothing here writes to a camera, an SD card or internal flash. The
-recovery-card and fast-loader tools in `tools/` produce offline artifacts that
-have **not** been tested on hardware, and say so in their build records.
+Nothing here writes to a camera, an SD card or internal flash. The fast loader
+and the recovery-card tools produce offline artifacts that have **not** been
+tested on hardware, and say so in their build records. SD boot leaves the
+camera's own firmware untouched; keep FujiMod's recovery card as the way back.

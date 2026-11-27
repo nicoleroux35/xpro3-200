@@ -8,7 +8,7 @@ Two independent things are needed to get past the transfer-engine stop:
    declared transmit receiver, so the fixed-destination DMA is modelled.
 2. A patch that forces the synchronous path instead of the completion-event
    wait, because the engine's service thread never exists in this
-   configuration. See reports/EMULATOR-2026-11-26.md §5-6.
+   configuration. See docs/CORRECTIONS-2026-11-27.md.
 
 Neither changes the firmware file; both are per-run and reversible.
 

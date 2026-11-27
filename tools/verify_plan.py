@@ -36,7 +36,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("firmware_dir", type=Path)
     parser.add_argument("fujimod_dir", type=Path, nargs="?",
-                        default=Path(__file__).resolve().parents[2] / "fujimod-xpro3")
+                        default=Path("fujimod"),
+                        help="FujiMod checkout (default: ./fujimod)")
     args = parser.parse_args()
 
     definition = equipment(args.firmware_dir)

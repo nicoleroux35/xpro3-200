@@ -10,7 +10,7 @@ Usage:
     tools/add_labels.py IN_PLAN OUT_PLAN [--labels 0xADDR[,0xADDR...]]...
 
 Default label set covers the boot chain measured in
-`reports/EMULATOR-2026-11-26.md`; pass extra addresses with --labels.
+`docs/CORRECTIONS-2026-11-27.md`; pass extra addresses with --labels.
 """
 
 from __future__ import annotations

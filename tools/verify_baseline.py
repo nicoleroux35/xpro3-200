@@ -69,17 +69,27 @@ def main() -> None:
         "baseline",
         type=Path,
         nargs="?",
-        default=Path(__file__).resolve().parents[1] / "reports/xpro3-2.00-baseline.json",
+        default=Path(__file__).resolve().parents[1] / "evidence/xpro3-2.00-baseline.json",
     )
     parser.add_argument(
         "--fujimod",
         type=Path,
-        default=Path(__file__).resolve().parents[2] / "fujimod-xpro3",
-        help="FujiMod checkout whose decompressor is used (defaults to the sibling copy)",
+        help="FujiMod checkout whose decompressor is used (default: ./fujimod)",
     )
     parser.add_argument("--skip-decompress", action="store_true",
                         help="check the container only, without unpacking the segments")
     args = parser.parse_args()
+
+    if not args.skip_decompress and args.fujimod is None:
+        for candidate in (Path("fujimod"), Path("../fujimod")):
+            if (candidate / "crates/firmware").is_dir():
+                args.fujimod = candidate
+                break
+        if args.fujimod is None:
+            parser.error(
+                "decompression needs a FujiMod checkout: pass --fujimod PATH, "
+                "or --skip-decompress to check the container only"
+            )
 
     baseline = json.loads(args.baseline.read_text())["baseline"]
     image = (args.firmware_dir / "FWUP0021.DAT").read_bytes()
