@@ -40,7 +40,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             libxkbcommon-dev libwayland-dev libx11-dev libgl1-mesa-dev
       - uses: dtolnay/rust-toolchain@stable
-      - name: Cache the workspace
+      - name: Clone FujiMod with its vendored Unicorn
+        run: git clone --recursive --depth 1 https://github.com/justjake/fujimod.git fujimod
+      - name: Install the bench into the checkout
+        run: ./scripts/install-bench.sh fujimod
+      - name: Cache the build directory
         uses: actions/cache@v4
         with:
           path: |
@@ -48,10 +52,6 @@ jobs:
             ~/.cargo/git
             fujimod/target
           key: bench-${{ hashFiles('bench/xpro3-bench/Cargo.toml') }}
-      - name: Install the bench into a FujiMod checkout
-        run: |
-          git clone --recursive --depth 1 https://github.com/justjake/fujimod.git fujimod
-          ./scripts/install-bench.sh fujimod
       - name: Build
         run: cargo build -p fujimod-xpro3-bench
         working-directory: fujimod
