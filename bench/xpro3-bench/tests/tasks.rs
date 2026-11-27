@@ -125,6 +125,34 @@ fn the_start_loop_registers_167_tasks_but_creates_no_thread() {
             "task {id:#x} must not have a thread"
         );
     }
+
+    // The records are copies, not identities. `0x1150210` builds a three-word
+    // stack record `{0, b, b}` and the loop passes its own counter as `b`, so
+    // 0x4BE9C writes `{src[0], src[4], src[8], src[4], 0}` into every slot.
+    // Hence: uniform records, and each slot pointing at its own copy.
+    let mut patterns = std::collections::BTreeSet::new();
+    let mut self_referential = 0;
+    for id in 1..=0xa7u32 {
+        let own = 0x63168 + (id - 1) * 0x14;
+        if board.read_word(0x7A944 + (id - 1) * 4) == own {
+            self_referential += 1;
+        }
+        patterns.insert((0..5).map(|i| board.read_word(own + i * 4)).collect::<Vec<_>>());
+    }
+    assert_eq!(
+        self_referential, 167,
+        "every registry slot points at its own record"
+    );
+    assert_eq!(
+        patterns.len(),
+        2,
+        "the records carry no per-task identity: {patterns:?}"
+    );
+    // The fourth word mirrors the second rather than reading a new one.
+    let first: Vec<u32> = (0..5).map(|i| board.read_word(0x63168 + i * 4)).collect();
+    assert_eq!(first[1], first[3], "the copy duplicates src[4] into +0xc");
+    assert_eq!(first[4], 0, "the copy zero-fills the last word");
+
     let _ = WATCHES;
 }
 

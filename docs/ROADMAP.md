@@ -14,7 +14,7 @@ step actually requires, separating what was measured from what is a guess.
 | fast SD loader for the X-Pro3 | **built**, reproduces bit for bit, **never run on a camera** |
 | emulator that runs the stock image | **done**, reaches storage init and beyond |
 | emulator that can show a menu | **no**: no application task is created |
-| a firmware modification that changes behaviour | **not started** |
+| a firmware modification that changes behaviour | **not started** — but the blocking record is decoded |
 
 The two halves are independent, and the second is the one that gates the first.
 
@@ -48,23 +48,50 @@ Measured on the stock image:
   sites; **38 are in the second FFLZ segment and referenced by nothing in the
   image**, which is the shape of entry points installed from outside it.
 
-A candidate modification follows directly: make one of the registered tasks
-become a thread, and watch the emulator. But which entry point, with which
-stack and priority, is not established. The descriptor written by `0x4BE9C` is
-`0x63168 + (id-1)*0x14`, and nothing has yet decoded that structure. Patching it
-blind would produce a crash loop, which is why the emulator has to come first.
+### Step 1 is done: the record is decoded
+
+The first part is settled, by disassembly and by measurement.
+
+`0x1150210(id, b)` builds a **three-word record** `{0, b, b}` on the stack and
+hands `&record` to `0x4BEF4`, which reads base, size and end — nothing else.
+`0x4BEF4` returns 0 on success and a negative code on refusal; with `base = 0`
+the alignment check passes, so it succeeds. It calls `0x48E14`, `0x48DE8`,
+`0x48EAC`, `0x48F30` and, on success, `0x4BE9C` — **a copy**, never
+`0x114F798`. The loop passes **the counter itself** as `b`, which is why 166 of
+the 167 records are byte-identical.
+
+`0x4BE9C(id, src)` writes `{src[0], src[4], src[8], src[4], 0}` into
+`0x63168+(id-1)*0x14` and stores that address in `0x7A944[id-1]`.
+
+### What that means for the patch
+
+Two shapes exist and must not be confused:
+
+| record | who writes it | fields |
+| --- | --- | --- |
+| registry entry, 20 bytes at `0x63168` | `0x4BE9C` | `{0, b, b, b, 0}` where `b` is the start loop's counter |
+| thread descriptor, 6 words on the stack | the four `idle` call sites at `0x1163550` | `{id, name, 0xf, 0x400, entry, 0}` |
+
+The `idle` threads are created by `0x114F798` from the second shape, with a name
+pointer into `0x15CA63C`, priority `0xf`, stack `0x400` and an entry at
+`0x1162F04`. A patch that turns a registry entry into a thread has to **build
+the second shape**, not hand `0x4BE9C` output to `0x114F798` — the two are not
+interchangeable, and `0x114F798` reads `param_1[6]` and writes with `+0x13fff`
+offsets, so a 20-byte record would be read out of bounds.
 
 The experiment, in order:
 
-1. Decode the 20-byte descriptor `0x4BE9C` stores, from the stock run.
-2. Find which fields `0x114F798` consumes, and in what order.
-3. Patch the start loop so one id — `TSK_UILIB` (`0x36`) — reaches
-   `tx_thread_create`.
+1. ~~Decode the record `0x4BE9C` stores.~~ **Done** — see above.
+2. Build a six-word descriptor for `TSK_UILIB` (`0x36`) from the `idle` shape,
+   with the entry point the task table names.
+3. Route that descriptor to `0x114F798` instead of `0x1150210`, as a recipe
+   `own` operation on the start loop.
 4. Run it in the emulator and read the milestone table: does the LCDC get
-   programmed? Does `outputs` stop being empty?
+   programmed? Does `outputs` stop being empty? Does a frame appear?
 
-Step 4 is the whole point of `bench/`. `docs/CORRECTIONS-2026-11-27.md` §4–5
-records why no other path reaches the display code.
+Step 4 is the whole point of `bench/`: it is the only way to find out, and a
+crash there is a cheap answer. Step 2 needs the task table entry for `0x36`,
+which is the next thing to read out of the image.
 
 ## Stage C — something a user can see
 

@@ -49,6 +49,80 @@ cargo run -p fujimod-xpro3-bench -- \
 the firmware's own menus, settings and inputs, under their internal names.
 `--view settings` (or `menus`, `inputs`, `screen`) opens on a tab.
 
+## What works, and what does not
+
+This is published unfinished on purpose: the measurements are real, the code
+runs, and the parts that are missing are named rather than implied.
+
+### Works
+
+- **The emulator runs the stock firmware.** FujiMod's XP4 emulator boots
+  `FWUP0021.DAT`, runs the ThreadX kernel, and reaches storage init. It then
+  continues past it — with **no firmware patch** — once the plan declares the
+  DMA lines the firmware actually arms. `--check` prints the milestone table as
+  JSON; without it you get a window with the firmware's own menus, settings and
+  input records, under their internal names.
+- **The stock base is reproducible.** `fujimod-sd-card sd-card-recovery-build`
+  turns the official update into `ffboot.bin` (`4806…`) and `ffinit.bin`
+  (`2ffa…`). Both hashes reproduce here; `tools/verify_baseline.py` re-checks
+  the update against the published baseline, container and both segments.
+- **A change can be published without publishing firmware.** Recipes carry
+  their author's bytes and point at the official image for everything else. The
+  builder refuses any unguarded input and any result that misses its pinned
+  hash; the validator refuses a payload that duplicates stock bytes.
+- **The fast loader is built and reproducible**, bit for bit, from the X-T3
+  recipe after verifying that both loaders hold identical code at every patch
+  site.
+- **15 tests pin the measurements**, and they skip themselves when the firmware
+  is absent, so CI is green without it.
+
+### Does not work yet
+
+- **No custom firmware modification exists.** Nothing changes the camera's
+  behaviour. The build chain can produce one; the change itself is not written.
+- **The emulator cannot show a menu of its own**, because the firmware never
+  creates its application tasks — see below. The window browses the firmware's
+  own records, not a rendered screen.
+- **The fast loader has never been run on a camera.** Every description says so,
+  and its build record says `camera_tested: false`.
+- **The full run stops at two refusals** unless the plan declares them: the
+  power controller's command-output register (observed, only the declaration is
+  missing) and the imaging path's fixed-destination DMA receiver, whose address
+  is **borrowed from the X-T3 and not measured here**.
+- **No frames are produced** (`frames: 0`, `outputs: {}`).
+
+### Why the tasks are never created — decoded
+
+This was an open question in the earlier reports; the chain is now readable in
+the image.
+
+- `TSK_ROOT` calls `0x1150210(id, b)` for ids `1..0xA7`, passing **the loop
+  counter itself** as `b` (`mov r5, r4` then `mov r1, r5` at `0x11635E0`).
+- `0x1150210` builds a **three-word record** on the stack — `{0, b, b}` at
+  `fp-0x18` — and hands `&record` to the validator `0x4BEF4`, which reads
+  `[r1]` (base), `[r1+4]` (size) and `[r1+8]` (end). Nothing else is read.
+- `0x4BEF4` returns **0 on success** and a negative code on refusal. It passes,
+  and `0x4BE9C` runs 167 times: it copies `src` into `0x63168+(id-1)*0x14`,
+  zero-fills `+0x10`, and stores the pointer in the registry `0x7A944`.
+- `0x4BE9C` writes the destination from that source as
+  `{src[0], src[4], src[8], src[4], 0}` — note the fourth word mirrors the
+  second rather than reading a new one. With `b = 1` that is `{0,1,1,1,0}`.
+- So every record holds the *same* `b` it was given, and 166 of the 167 are
+  byte-identical. Measured: 2 distinct records out of 167, each slot pointing at
+  its own copy.
+- **`0x4BEF4` never creates a thread.** It calls only `0x48E14`, `0x48DE8`,
+  `0x48EAC`, `0x48F30` and — on success — `0x4BE9C`, a pure copy. The only
+  thread-creation path, `0x114F798`, is `tx_thread_create` by name, and it is
+  entered exactly **5** times, all through `0x1143C10` for the `execcpu` ids.
+  Nothing the start loop calls reaches `0x114F798`.
+- The 38 unreachable callers of `0x114F798` remain unreachable: they are in the
+  second segment and nothing in the image references them.
+
+The honest reading: the start loop registers records, not threads, and the
+thing that would turn a record into a thread is not reached. **No patch is
+included for it**, because none has been written and tested. That is the first
+real task, and [`docs/ROADMAP.md`](docs/ROADMAP.md) states what it requires.
+
 ## What the emulator established
 
 The stock image reaches storage init and, given the wiring its own catalog

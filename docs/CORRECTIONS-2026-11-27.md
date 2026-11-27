@@ -123,6 +123,35 @@ The eleven threads, read from `0x655A4 + (id-1)*0x150`:
 No application task has a thread. `TSK_UILIB` (`0x36`) and `TSK_LCDEVF`
 (`0x37`) are registered and have none.
 
+### Why the loop is a registry insert and not a thread create
+
+The chain is readable in the image, and it explains the table above.
+
+`0x11635E0` sets `r5 = r4` and the loop then does `mov r1, r5` before each
+call: **the value passed as the descriptor is the loop counter itself**, not a
+pointer. `0x1150210` builds a three-word record on the stack — `{0, b, b}` at
+`fp-0x18` — and passes `&record` to the validator `0x4BEF4`, which reads `[r1]`
+as base, `[r1+4]` as size and `[r1+8]` as end, and nothing else.
+
+`0x4BEF4` returns **0 on success** and a negative code on refusal: `-0x11` for
+an out-of-range id, `-0x10` for a null descriptor or an inverted range, `-0xa`
+for an unaligned base, `-0x18` for a lock-token mismatch. With `base = 0` the
+alignment check passes, so the call succeeds.
+
+Its callees are `0x48E14`, `0x48DE8`, `0x48EAC`, `0x48F30` and, on success,
+`0x4BE9C` — a copy. **None of them reaches `0x114F798`**: measured, `0x114F798`
+is entered exactly five times in the whole run, all from `0x1143C10`, which is
+the `execcpu` init.
+
+`0x4BE9C(id, src)` writes `{src[0], src[4], src[8], src[4], 0}` into
+`0x63168+(id-1)*0x14` and stores that address in `0x7A944[id-1]`. The fourth
+word mirrors the second rather than reading a new one, which is why the records
+are uniform. Measured over the stock plan: **2 distinct records out of 167**,
+and each registry slot points at its own copy.
+
+So the loop registers records, not threads. That is not an inference from the
+absence of threads; it is the shape of the code and of the memory it leaves.
+
 Of the 23 subsystem init calls that follow the start loop
 (`0x11635FC..0x1163744`), exactly **one** reaches `tx_thread_create`:
 `0x1163A54`, which calls `0x1143C10`. That function walks a five-entry table at
