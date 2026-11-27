@@ -1,0 +1,38 @@
+[package]
+name = "fujimod-xpro3-bench"
+description = "X-Pro3 XP4 analysis bench: runs the stock firmware and shows what it does"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+license.workspace = true
+
+[lib]
+name = "fujimod_xpro3_bench"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fujimod-xpro3-bench"
+path = "src/main.rs"
+
+[dev-dependencies]
+serde_json.workspace = true
+
+[dependencies]
+fujimod-emulator-boot = { workspace = true, features = ["xp5-startup"] }
+fujimod-catalog.workspace = true
+fujimod-catalog-configuration.workspace = true
+fujimod-catalog-resolution.workspace = true
+fujimod-emulator-exr2-board = { path = "../../crates/emulator-exr2-board" }
+fujimod-emulator-models = { path = "../../crates/emulator-models" }
+serde_json.workspace = true
+eframe = { version = "0.37.0", default-features = false, features = [
+  "glow",
+  "default_fonts",
+  "x11",
+  "wayland",
+] }
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "deny"

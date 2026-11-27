@@ -1,0 +1,34 @@
+# Fujifilm firmware never enters this repository. Every tool and test takes the
+# update as an argument; these patterns are a guard, not a licence to add it.
+*.DAT
+*.dat
+FWUP*.zip
+FPUPDATE*
+ffboot.bin
+ffinit.bin
+boot-info.bin
+/firmware/
+/firmware-dir/
+/xpro3-firmware/
+
+# Build output.
+/target/
+**/target/
+**/__pycache__/
+*.pyc
+.ruff_cache/
+.pytest_cache/
+.venv/
+
+# Emulator snapshots and generated plans are local artifacts.
+*.bin
+!evidence/*.bin
+/snapshots/
+*.bench-*.json
+.*.bench-*.json
+
+# Editors and OS.
+.DS_Store
+*.swp
+.idea/
+.vscode/

@@ -1,0 +1,884 @@
+{
+  "source": "cdeschenes/fujifilm-xFW X-Pro3/analysis/baseline.json",
+  "retrieved": "2026-11-25",
+  "note": "Verbatim copy, kept for offline cross-check by tools/verify_baseline.py.",
+  "baseline": {
+    "path": "FWUP0021.DAT",
+    "file_size": 50087104,
+    "sha256": "30ca22af2e1341c65d8f0637cc5e3ec675628cee8f517de0f1275bb5725c9f39",
+    "header": {
+      "group_count": 6,
+      "model_ids": [
+        "00055711"
+      ],
+      "words": [
+        2,
+        0,
+        3310070574,
+        4292206793
+      ],
+      "version": "2.00"
+    },
+    "payload_sha256": "becb73f1b10d29a411e80ff1d62196c447c2a598c449b28b0f14755385b1982c",
+    "fflz_segments": [
+      {
+        "file_offset": 2490996,
+        "unpacked_size": 7530776,
+        "packed_size": 3259398,
+        "load_addr": 15863808,
+        "image_size": 7532544,
+        "sha256": "c45dbd72ba3f2733c73713ae301fb0ac3c359df14d5cae5c0d94cfe6bb154f23"
+      },
+      {
+        "file_offset": 5767796,
+        "unpacked_size": 8667136,
+        "packed_size": 4783824,
+        "load_addr": 30289920,
+        "image_size": 8667136,
+        "sha256": "bc49ab43766dea21e43b812e2dc6f8b473c7bb4ca0cd4decd7427da659934546"
+      }
+    ],
+    "raw_images": [
+      {
+        "file_offset": 393844,
+        "load_addr": 262144,
+        "size": 110784
+      }
+    ],
+    "content_map": [
+      {
+        "start": 0,
+        "end": 131072,
+        "kind": "data"
+      },
+      {
+        "start": 131072,
+        "end": 196608,
+        "kind": "arm"
+      },
+      {
+        "start": 196608,
+        "end": 262144,
+        "kind": "pad"
+      },
+      {
+        "start": 262144,
+        "end": 393216,
+        "kind": "data"
+      },
+      {
+        "start": 393216,
+        "end": 524288,
+        "kind": "arm"
+      },
+      {
+        "start": 524288,
+        "end": 786432,
+        "kind": "data"
+      },
+      {
+        "start": 786432,
+        "end": 917504,
+        "kind": "ascii"
+      },
+      {
+        "start": 917504,
+        "end": 1048576,
+        "kind": "data"
+      },
+      {
+        "start": 1048576,
+        "end": 1114112,
+        "kind": "ascii"
+      },
+      {
+        "start": 1114112,
+        "end": 1310720,
+        "kind": "data"
+      },
+      {
+        "start": 1310720,
+        "end": 1441792,
+        "kind": "pad"
+      },
+      {
+        "start": 1441792,
+        "end": 1638400,
+        "kind": "arm"
+      },
+      {
+        "start": 1638400,
+        "end": 1703936,
+        "kind": "pad"
+      },
+      {
+        "start": 1703936,
+        "end": 1966080,
+        "kind": "data"
+      },
+      {
+        "start": 1966080,
+        "end": 2162688,
+        "kind": "arm"
+      },
+      {
+        "start": 2162688,
+        "end": 2228224,
+        "kind": "pad"
+      },
+      {
+        "start": 2228224,
+        "end": 4521984,
+        "kind": "data"
+      },
+      {
+        "start": 4521984,
+        "end": 4784128,
+        "kind": "ascii"
+      },
+      {
+        "start": 4784128,
+        "end": 4915200,
+        "kind": "data"
+      },
+      {
+        "start": 4915200,
+        "end": 4980736,
+        "kind": "ascii"
+      },
+      {
+        "start": 4980736,
+        "end": 5308416,
+        "kind": "data"
+      },
+      {
+        "start": 5308416,
+        "end": 5373952,
+        "kind": "high-entropy"
+      },
+      {
+        "start": 5373952,
+        "end": 5439488,
+        "kind": "data"
+      },
+      {
+        "start": 5439488,
+        "end": 5505024,
+        "kind": "ascii"
+      },
+      {
+        "start": 5505024,
+        "end": 9633792,
+        "kind": "data"
+      },
+      {
+        "start": 9633792,
+        "end": 9764864,
+        "kind": "ascii"
+      },
+      {
+        "start": 9764864,
+        "end": 9830400,
+        "kind": "data"
+      },
+      {
+        "start": 9830400,
+        "end": 9895936,
+        "kind": "ascii"
+      },
+      {
+        "start": 9895936,
+        "end": 9961472,
+        "kind": "data"
+      },
+      {
+        "start": 9961472,
+        "end": 10092544,
+        "kind": "ascii"
+      },
+      {
+        "start": 10092544,
+        "end": 10289152,
+        "kind": "data"
+      },
+      {
+        "start": 10289152,
+        "end": 10354688,
+        "kind": "ascii"
+      },
+      {
+        "start": 10354688,
+        "end": 10551296,
+        "kind": "data"
+      },
+      {
+        "start": 10551296,
+        "end": 10616832,
+        "kind": "pad"
+      },
+      {
+        "start": 10616832,
+        "end": 14745600,
+        "kind": "arm"
+      },
+      {
+        "start": 14745600,
+        "end": 14876672,
+        "kind": "ascii"
+      },
+      {
+        "start": 14876672,
+        "end": 17629184,
+        "kind": "data"
+      },
+      {
+        "start": 17629184,
+        "end": 19660800,
+        "kind": "arm"
+      },
+      {
+        "start": 19660800,
+        "end": 19791872,
+        "kind": "ascii"
+      },
+      {
+        "start": 19791872,
+        "end": 19988480,
+        "kind": "data"
+      },
+      {
+        "start": 19988480,
+        "end": 20119552,
+        "kind": "ascii"
+      },
+      {
+        "start": 20119552,
+        "end": 20381696,
+        "kind": "data"
+      },
+      {
+        "start": 20381696,
+        "end": 20512768,
+        "kind": "ascii"
+      },
+      {
+        "start": 20512768,
+        "end": 20774912,
+        "kind": "data"
+      },
+      {
+        "start": 20774912,
+        "end": 21299200,
+        "kind": "ascii"
+      },
+      {
+        "start": 21299200,
+        "end": 21364736,
+        "kind": "pad"
+      },
+      {
+        "start": 21364736,
+        "end": 23199744,
+        "kind": "data"
+      },
+      {
+        "start": 23199744,
+        "end": 23265280,
+        "kind": "ascii"
+      },
+      {
+        "start": 23265280,
+        "end": 23461888,
+        "kind": "data"
+      },
+      {
+        "start": 23461888,
+        "end": 23592960,
+        "kind": "high-entropy"
+      },
+      {
+        "start": 23592960,
+        "end": 23658496,
+        "kind": "data"
+      },
+      {
+        "start": 23658496,
+        "end": 23724032,
+        "kind": "high-entropy"
+      },
+      {
+        "start": 23724032,
+        "end": 23855104,
+        "kind": "data"
+      },
+      {
+        "start": 23855104,
+        "end": 24379392,
+        "kind": "high-entropy"
+      },
+      {
+        "start": 24379392,
+        "end": 24510464,
+        "kind": "data"
+      },
+      {
+        "start": 24510464,
+        "end": 24576000,
+        "kind": "high-entropy"
+      },
+      {
+        "start": 24576000,
+        "end": 31129600,
+        "kind": "data"
+      },
+      {
+        "start": 31129600,
+        "end": 31391744,
+        "kind": "pad"
+      },
+      {
+        "start": 31391744,
+        "end": 31457280,
+        "kind": "data"
+      },
+      {
+        "start": 31457280,
+        "end": 31850496,
+        "kind": "ascii"
+      },
+      {
+        "start": 31850496,
+        "end": 31916032,
+        "kind": "data"
+      },
+      {
+        "start": 31916032,
+        "end": 31981568,
+        "kind": "pad"
+      },
+      {
+        "start": 31981568,
+        "end": 32047104,
+        "kind": "data"
+      },
+      {
+        "start": 32047104,
+        "end": 32178176,
+        "kind": "utf16"
+      },
+      {
+        "start": 32178176,
+        "end": 32309248,
+        "kind": "data"
+      },
+      {
+        "start": 32309248,
+        "end": 32505856,
+        "kind": "utf16"
+      },
+      {
+        "start": 32505856,
+        "end": 32571392,
+        "kind": "data"
+      },
+      {
+        "start": 32571392,
+        "end": 32768000,
+        "kind": "utf16"
+      },
+      {
+        "start": 32768000,
+        "end": 32833536,
+        "kind": "data"
+      },
+      {
+        "start": 32833536,
+        "end": 33030144,
+        "kind": "utf16"
+      },
+      {
+        "start": 33030144,
+        "end": 33095680,
+        "kind": "data"
+      },
+      {
+        "start": 33095680,
+        "end": 33292288,
+        "kind": "utf16"
+      },
+      {
+        "start": 33292288,
+        "end": 33357824,
+        "kind": "data"
+      },
+      {
+        "start": 33357824,
+        "end": 33488896,
+        "kind": "utf16"
+      },
+      {
+        "start": 33488896,
+        "end": 33619968,
+        "kind": "data"
+      },
+      {
+        "start": 33619968,
+        "end": 33816576,
+        "kind": "utf16"
+      },
+      {
+        "start": 33816576,
+        "end": 33882112,
+        "kind": "data"
+      },
+      {
+        "start": 33882112,
+        "end": 34013184,
+        "kind": "utf16"
+      },
+      {
+        "start": 34013184,
+        "end": 34144256,
+        "kind": "data"
+      },
+      {
+        "start": 34144256,
+        "end": 34340864,
+        "kind": "utf16"
+      },
+      {
+        "start": 34340864,
+        "end": 34406400,
+        "kind": "data"
+      },
+      {
+        "start": 34406400,
+        "end": 34537472,
+        "kind": "utf16"
+      },
+      {
+        "start": 34537472,
+        "end": 34668544,
+        "kind": "data"
+      },
+      {
+        "start": 34668544,
+        "end": 34865152,
+        "kind": "utf16"
+      },
+      {
+        "start": 34865152,
+        "end": 34930688,
+        "kind": "data"
+      },
+      {
+        "start": 34930688,
+        "end": 35127296,
+        "kind": "utf16"
+      },
+      {
+        "start": 35127296,
+        "end": 35192832,
+        "kind": "data"
+      },
+      {
+        "start": 35192832,
+        "end": 35389440,
+        "kind": "utf16"
+      },
+      {
+        "start": 35389440,
+        "end": 35454976,
+        "kind": "data"
+      },
+      {
+        "start": 35454976,
+        "end": 35651584,
+        "kind": "utf16"
+      },
+      {
+        "start": 35651584,
+        "end": 35717120,
+        "kind": "data"
+      },
+      {
+        "start": 35717120,
+        "end": 35913728,
+        "kind": "utf16"
+      },
+      {
+        "start": 35913728,
+        "end": 35979264,
+        "kind": "data"
+      },
+      {
+        "start": 35979264,
+        "end": 36175872,
+        "kind": "utf16"
+      },
+      {
+        "start": 36175872,
+        "end": 36241408,
+        "kind": "data"
+      },
+      {
+        "start": 36241408,
+        "end": 36438016,
+        "kind": "utf16"
+      },
+      {
+        "start": 36438016,
+        "end": 36503552,
+        "kind": "data"
+      },
+      {
+        "start": 36503552,
+        "end": 36700160,
+        "kind": "utf16"
+      },
+      {
+        "start": 36700160,
+        "end": 36765696,
+        "kind": "data"
+      },
+      {
+        "start": 36765696,
+        "end": 36962304,
+        "kind": "utf16"
+      },
+      {
+        "start": 36962304,
+        "end": 37027840,
+        "kind": "data"
+      },
+      {
+        "start": 37027840,
+        "end": 37224448,
+        "kind": "utf16"
+      },
+      {
+        "start": 37224448,
+        "end": 37289984,
+        "kind": "data"
+      },
+      {
+        "start": 37289984,
+        "end": 37486592,
+        "kind": "utf16"
+      },
+      {
+        "start": 37486592,
+        "end": 37552128,
+        "kind": "data"
+      },
+      {
+        "start": 37552128,
+        "end": 37748736,
+        "kind": "utf16"
+      },
+      {
+        "start": 37748736,
+        "end": 37814272,
+        "kind": "data"
+      },
+      {
+        "start": 37814272,
+        "end": 38010880,
+        "kind": "utf16"
+      },
+      {
+        "start": 38010880,
+        "end": 38076416,
+        "kind": "data"
+      },
+      {
+        "start": 38076416,
+        "end": 38273024,
+        "kind": "utf16"
+      },
+      {
+        "start": 38273024,
+        "end": 38338560,
+        "kind": "data"
+      },
+      {
+        "start": 38338560,
+        "end": 38535168,
+        "kind": "utf16"
+      },
+      {
+        "start": 38535168,
+        "end": 38600704,
+        "kind": "data"
+      },
+      {
+        "start": 38600704,
+        "end": 38797312,
+        "kind": "utf16"
+      },
+      {
+        "start": 38797312,
+        "end": 38862848,
+        "kind": "data"
+      },
+      {
+        "start": 38862848,
+        "end": 39059456,
+        "kind": "utf16"
+      },
+      {
+        "start": 39059456,
+        "end": 39124992,
+        "kind": "data"
+      },
+      {
+        "start": 39124992,
+        "end": 39321600,
+        "kind": "utf16"
+      },
+      {
+        "start": 39321600,
+        "end": 39387136,
+        "kind": "data"
+      },
+      {
+        "start": 39387136,
+        "end": 39583744,
+        "kind": "utf16"
+      },
+      {
+        "start": 39583744,
+        "end": 39649280,
+        "kind": "data"
+      },
+      {
+        "start": 39649280,
+        "end": 39845888,
+        "kind": "utf16"
+      },
+      {
+        "start": 39845888,
+        "end": 39911424,
+        "kind": "data"
+      },
+      {
+        "start": 39911424,
+        "end": 40042496,
+        "kind": "utf16"
+      },
+      {
+        "start": 40042496,
+        "end": 40173568,
+        "kind": "data"
+      },
+      {
+        "start": 40173568,
+        "end": 40370176,
+        "kind": "utf16"
+      },
+      {
+        "start": 40370176,
+        "end": 40435712,
+        "kind": "data"
+      },
+      {
+        "start": 40435712,
+        "end": 40632320,
+        "kind": "utf16"
+      },
+      {
+        "start": 40632320,
+        "end": 40697856,
+        "kind": "data"
+      },
+      {
+        "start": 40697856,
+        "end": 40894464,
+        "kind": "utf16"
+      },
+      {
+        "start": 40894464,
+        "end": 40960000,
+        "kind": "data"
+      },
+      {
+        "start": 40960000,
+        "end": 41156608,
+        "kind": "utf16"
+      },
+      {
+        "start": 41156608,
+        "end": 41418752,
+        "kind": "data"
+      },
+      {
+        "start": 41418752,
+        "end": 41549824,
+        "kind": "ascii"
+      },
+      {
+        "start": 41549824,
+        "end": 43253760,
+        "kind": "data"
+      },
+      {
+        "start": 43253760,
+        "end": 43384832,
+        "kind": "ascii"
+      },
+      {
+        "start": 43384832,
+        "end": 44171264,
+        "kind": "data"
+      },
+      {
+        "start": 44171264,
+        "end": 44302336,
+        "kind": "ascii"
+      },
+      {
+        "start": 44302336,
+        "end": 44695552,
+        "kind": "data"
+      },
+      {
+        "start": 44695552,
+        "end": 44761088,
+        "kind": "ascii"
+      },
+      {
+        "start": 44761088,
+        "end": 45088768,
+        "kind": "data"
+      },
+      {
+        "start": 45088768,
+        "end": 45285376,
+        "kind": "ascii"
+      },
+      {
+        "start": 45285376,
+        "end": 45744128,
+        "kind": "data"
+      },
+      {
+        "start": 45744128,
+        "end": 45940736,
+        "kind": "ascii"
+      },
+      {
+        "start": 45940736,
+        "end": 46006272,
+        "kind": "data"
+      },
+      {
+        "start": 46006272,
+        "end": 46137344,
+        "kind": "ascii"
+      },
+      {
+        "start": 46137344,
+        "end": 46530560,
+        "kind": "data"
+      },
+      {
+        "start": 46530560,
+        "end": 46661632,
+        "kind": "ascii"
+      },
+      {
+        "start": 46661632,
+        "end": 46792704,
+        "kind": "data"
+      },
+      {
+        "start": 46792704,
+        "end": 46858240,
+        "kind": "ascii"
+      },
+      {
+        "start": 46858240,
+        "end": 46989312,
+        "kind": "data"
+      },
+      {
+        "start": 46989312,
+        "end": 47054848,
+        "kind": "ascii"
+      },
+      {
+        "start": 47054848,
+        "end": 47251456,
+        "kind": "data"
+      },
+      {
+        "start": 47251456,
+        "end": 47316992,
+        "kind": "ascii"
+      },
+      {
+        "start": 47316992,
+        "end": 47513600,
+        "kind": "data"
+      },
+      {
+        "start": 47513600,
+        "end": 47579136,
+        "kind": "pad"
+      },
+      {
+        "start": 47579136,
+        "end": 50087104,
+        "kind": "data"
+      }
+    ],
+    "fingerprints": {
+      "ThreadX": [
+        "G5.6.2.5.0"
+      ],
+      "zlib deflate": [
+        "1.2.11"
+      ],
+      "zlib inflate": [
+        "1.2.11"
+      ],
+      "wpa_supplicant": [
+        "wpa_supplicant"
+      ],
+      "hostapd": [
+        "hostapd"
+      ],
+      "SQLite": [
+        "3"
+      ],
+      "Bluetooth": [
+        "Bluetooth"
+      ]
+    },
+    "keywords": {
+      "password": 3,
+      "passwd": 5,
+      "debug": 9,
+      "telnet": 0,
+      "root": 12,
+      "SSID": 190,
+      "WPA2": 10,
+      "WPS": 159,
+      "certificate": 1,
+      "RSA": 15,
+      "SHA256": 2,
+      "SHA1": 1,
+      "MD5": 0,
+      "AES": 19,
+      "signature": 2,
+      "update": 34,
+      "FWUP": 10,
+      "FPUPDATE": 1,
+      "AUTO_ACT.SCR": 1,
+      "192.168.": 3,
+      "http://": 13,
+      "https://": 0
+    },
+    "schema": "fwup-baseline/1"
+  }
+}

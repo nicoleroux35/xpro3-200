@@ -1,0 +1,71 @@
+# NOTICE — sources of this project
+
+This project is original work about the Fujifilm X-Pro3 2.00 firmware. It
+stands on four upstream projects, cited below with what was taken from each.
+Nothing in this repository contains Fujifilm firmware bytes.
+
+## Fujifilm X-Pro3 2.00 update (`FWUP0021.DAT`)
+
+- **Proprietary.** Not distributed here, not linked, not mirrored.
+- SHA-256 `30ca22af2e1341c65d8f0637cc5e3ec675628cee8f517de0f1275bb5725c9f39`,
+  50 087 104 bytes.
+- Obtainable only from Fujifilm. Every tool and test in this repository takes
+  the file as an argument, and the tests skip themselves when it is absent.
+- The decompiled excerpts in `evidence/decompile/` are analysis output derived
+  from that file, published for interoperability research. They are not a
+  redistribution of it.
+
+## `justjake/fujimod` — https://github.com/justjake/fujimod
+
+- **GPL-2.0-only.** This project is distributed under the same licence.
+- The bench (`bench/xpro3-bench/`) is written against its emulator and catalog
+  crates and links them: `fujimod-emulator-boot`, `fujimod-catalog`,
+  `fujimod-catalog-configuration`, `fujimod-catalog-resolution`,
+  `fujimod-emulator-exr2-board`, `fujimod-emulator-models`.
+- The run configuration in `configs/` follows its `RunConfiguration` schema.
+- Upstream is the original project; this is not a fork of it. The bench is a
+  workspace member that is installed into a fujimod checkout (see
+  `scripts/install-bench.sh`) precisely so the two stay separable.
+- Its emulator runtime links Unicorn Engine through `justjake/unicorn`
+  (GPL-2.0).
+
+## `cdeschenes/fujifilm-xFW` — https://github.com/cdeschenes/fujifilm-xFW
+
+- **MIT, Copyright (c) 2026 Cody Deschenes.** Full text in
+  `LICENSES/fujifilm-xFW-MIT.txt`.
+- `evidence/xpro3-2.00-baseline.json` is its `X-Pro3/analysis/baseline.json`
+  for this exact update: two FFLZ segments with load addresses, the raw image,
+  the content map, string fingerprints. The segment map in
+  `bench/xpro3-bench/src/dispatch.rs` is derived from it.
+- Its `CROSS-MODEL-COMPARISON.md` supplied the cross-model function addresses
+  discussed in `docs/`.
+
+## `tiredboffin/fffw` — https://github.com/tiredboffin/fffw
+
+- **MIT, Copyright (c) 2024 tiredboffin@gmail.com.** Full text in
+  `LICENSES/fffw-MIT.txt`.
+- Cited as the published state of the art for Fujifilm research tooling:
+  `ffun` (not published, "most modules don't even build yet") and `ff80` (a JIG
+  tool requiring the camera). Neither is included or used at run time. Its
+  per-body headers (`ffun/ports/*/task.h`, `ui_setp.h`) informed the
+  cross-model reasoning recorded in `docs/PORTING.md`.
+
+## `johnborillo/xt3-cfw` — https://github.com/johnborillo/xt3-cfw
+
+- **MIT, Copyright (c) 2026 the xt3-cfw contributors.** Full text in
+  `LICENSES/xt3-cfw-MIT.txt`.
+- `evidence/hook-comparison-*.md` and `evidence/function-candidates.json`
+  compare its 371 guarded X-T3 hook sites against the X-Pro3, X-T4 and X100V
+  images. The recipe itself is not redistributed; the comparison is.
+
+## `fujihack/fujihack` — https://github.com/fujihack/fujihack
+
+- **GPL-3.0.** Cited only; no code taken. Referenced in `docs/` for the
+  service-mode (PTP) channel and the brick-recovery procedures.
+
+## How to verify the citations
+
+Every hash, address and count in `docs/` is reproducible from the named source
+with the tools in `tools/`, except where a document explicitly says a value is
+declared virtual rather than measured. Where the two disagree, the measurement
+wins and `docs/CORRECTIONS-2026-11-27.md` records the correction.

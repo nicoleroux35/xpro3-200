@@ -1,0 +1,9 @@
+{
+  "hardware": {
+    "profiles": {
+      "xpro3-200-handoff": {
+        "dram_basis": "Declared 512 MiB execution bound for the X-Pro3 2.00 recovery image; physical DRAM density is not asserted."
+      }
+    }
+  }
+}

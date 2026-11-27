@@ -1,0 +1,25 @@
+{
+  "$schema": "https://fujimod.com/schemas/emulator-run-configuration.schema.json",
+  "schema": 1,
+  "id": "xpro3-200-handoff",
+  "purpose": "rom_boot",
+  "body_id": "xpro3",
+  "firmware_id": "xpro3-200",
+  "start": {
+    "kind": "loader"
+  },
+  "execution": null,
+  "overlays": [],
+  "dram_address_space": {
+    "limit_bytes": 536870912,
+    "basis": "Declared 512 MiB execution bound for the X-Pro3 2.00 recovery image; physical DRAM density is not asserted."
+  },
+  "preset": {
+    "factory_options": {},
+    "hardware_selection": {
+      "soc_profile_id": "xp4",
+      "body_profile_id": "xpro3-200-handoff"
+    },
+    "hardware_inputs_id": "xpro3-200-handoff"
+  }
+}
